@@ -12,14 +12,18 @@
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.2",
     "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-java": "^6.0.1",
+    "@codemirror/lang-python": "^6.1.7",
     "@tailwindcss/vite": "^4.0.12",
     "@uiw/react-codemirror": "^4.23.10",
     "axios": "^1.8.2",
     "dompurify": "^3.2.4",
+    "lucide-react": "^0.482.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-resizable-panels": "^2.1.7",
-    "react-router-dom": "^7.3.0"
+    "react-router-dom": "^7.3.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

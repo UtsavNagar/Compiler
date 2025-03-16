@@ -1,24 +1,22 @@
-import axios from "axios";
-import API from "./api";
+const DOMAIN = "http://localhost:9090/api/compile";
 
-const DOMAIN = "http://localhost:9090";
-
-export const compileCppCode = async (data: { code: string; input: string }) => {
+export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {
-    const response = await fetch(DOMAIN+API.cppCompilationApi, {
+    let endpoint = `${DOMAIN}/${data.language}`; // Dynamically choose the right API endpoint
+
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data), // Send JSON
+      body: JSON.stringify({ code: data.code, input: data.input }), // Send only required data
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const result = await response.text();
-    return result;
+    return await response.text();
   } catch (error) {
     if (error instanceof Error) {
       return "Error: " + error.message;
@@ -26,5 +24,3 @@ export const compileCppCode = async (data: { code: string; input: string }) => {
     return "An unknown error occurred";
   }
 };
-
-

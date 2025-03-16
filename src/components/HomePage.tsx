@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 // Simple icon components
 const CodeIcon = () => (
@@ -50,46 +51,9 @@ interface LinkProps {
   children: React.ReactNode;
 }
 
-const Link: React.FC<LinkProps> = ({ to, className, children }) => (
-  <a href={to} className={className}>{children}</a>
-);
-
 const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      {/* Navigation Bar */}
-      <nav className="px-6 py-4 flex justify-between items-center border-b border-gray-700">
-        <div className="flex items-center space-x-2">
-          <CodeIcon />
-          <span className="font-bold text-xl">CodeCompile</span>
-        </div>
-        
-        {/* Added the requested menu */}
-        <div className="hidden md:flex space-x-6">
-          <Link to="/html-compiler" className="hover:text-blue-400 transition">
-            HTML Compiler
-          </Link>
-          <Link to="/cpp-compiler" className="hover:text-blue-400 transition">
-            C++ Compiler
-          </Link>
-          <Link to="/java-compiler" className="hover:text-blue-400 transition">
-            Java Compiler
-          </Link>
-          <Link to="/python-compiler" className="hover:text-blue-400 transition">
-            Python Compiler
-          </Link>
-          <Link to="/js-compiler" className="hover:text-blue-400 transition">
-            JS Compiler
-          </Link>
-          <Link to="/code-converter" className="hover:text-blue-400 transition">
-            AI Converter
-          </Link>
-        </div>
-        
-        <button className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md font-semibold transition">
-          Try Now
-        </button>
-      </nav>
 
       {/* Hero Section */}
       <section className="max-w-5xl mx-auto px-6 py-16 md:py-24 text-center">
@@ -101,9 +65,11 @@ const HomePage: React.FC = () => {
           A lightweight, blazing-fast code compiler for developers who value simplicity and efficiency.
         </p>
         <div className="flex flex-col md:flex-row justify-center gap-4">
-          <button className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-md font-semibold transition flex items-center justify-center">
-            Start Coding <ArrowRightIcon />
-          </button>
+          <Link to={"/compilers"}>
+            <button className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-md font-semibold transition flex items-center justify-center">
+              Start Coding <ArrowRightIcon />
+            </button>
+          </Link>
           <button className="bg-transparent border border-gray-600 hover:border-gray-400 px-6 py-3 rounded-md font-semibold transition">
             Learn More
           </button>
@@ -113,7 +79,7 @@ const HomePage: React.FC = () => {
       {/* Features Section */}
       <section id="features" className="max-w-6xl mx-auto px-6 py-16 bg-gray-800 rounded-lg my-8 shadow-xl">
         <h2 className="text-3xl font-bold mb-12 text-center">Key Features</h2>
-        
+
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-gray-700 p-6 rounded-lg">
             <div className="bg-blue-500 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
@@ -124,7 +90,7 @@ const HomePage: React.FC = () => {
               Compile your code with a single click. Support for multiple programming languages with Java APIs integration.
             </p>
           </div>
-          
+
           <div className="bg-gray-700 p-6 rounded-lg">
             <div className="bg-green-500 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
               <LayoutGridIcon />
@@ -134,7 +100,7 @@ const HomePage: React.FC = () => {
               Built with performance in mind. Our compiler loads instantly and works smoothly even on slower connections.
             </p>
           </div>
-          
+
           <div className="bg-gray-700 p-6 rounded-lg">
             <div className="bg-purple-500 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
               <ZapIcon />
@@ -145,7 +111,7 @@ const HomePage: React.FC = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Added new features section */}
         <div className="grid md:grid-cols-2 gap-8 mt-8">
           <div className="bg-gray-700 p-6 rounded-lg">
@@ -157,7 +123,7 @@ const HomePage: React.FC = () => {
               See your HTML changes instantly with our live preview feature. Perfect for web developers who want immediate visual feedback.
             </p>
           </div>
-          
+
           <div className="bg-gray-700 p-6 rounded-lg">
             <div className="bg-red-500 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
               <BrainIcon />
@@ -173,23 +139,23 @@ const HomePage: React.FC = () => {
       {/* Languages Section */}
       <section className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-8 text-center">Supported Languages</h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-gray-800 p-6 rounded-lg text-center hover:bg-gray-700 transition cursor-pointer">
             <div className="text-5xl font-bold mb-2 text-blue-400">&#60;/&#62;</div>
             <h3 className="text-xl font-semibold">HTML</h3>
           </div>
-          
+
           <div className="bg-gray-800 p-6 rounded-lg text-center hover:bg-gray-700 transition cursor-pointer">
             <div className="text-5xl font-bold mb-2 text-purple-400">C++</div>
             <h3 className="text-xl font-semibold">C++</h3>
           </div>
-          
+
           <div className="bg-gray-800 p-6 rounded-lg text-center hover:bg-gray-700 transition cursor-pointer">
             <div className="text-5xl font-bold mb-2 text-orange-400">☕</div>
             <h3 className="text-xl font-semibold">Java</h3>
           </div>
-          
+
           <div className="bg-gray-800 p-6 rounded-lg text-center hover:bg-gray-700 transition cursor-pointer">
             <div className="text-5xl font-bold mb-2 text-yellow-400">🐍</div>
             <h3 className="text-xl font-semibold">Python</h3>
@@ -226,47 +192,47 @@ const HomePage: React.FC = () => {
       {/* Code Languages Section - Added this new section */}
       <section className="max-w-6xl mx-auto px-6 py-12 bg-gray-800 rounded-lg">
         <h2 className="text-3xl font-bold mb-8">Our Code Compilers</h2>
-        
+
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-700 p-5 rounded-lg">
             <h3 className="text-xl font-semibold text-blue-400 mb-2">Java Code Compiler</h3>
             <p className="mb-4">Compile and run Java code with full API support. Perfect for building robust applications.</p>
             <p className="text-sm text-gray-400 mb-2">Note: Compile time input features not available</p>
             <div className="flex justify-end">
-              <Link to="/java-compiler" className="text-blue-400 hover:text-blue-300 flex items-center">
+              <Link to="/compilers" className="text-blue-400 hover:text-blue-300 flex items-center">
                 Try now <ArrowRightIcon />
               </Link>
             </div>
           </div>
-          
+
           <div className="bg-gray-700 p-5 rounded-lg">
             <h3 className="text-xl font-semibold text-purple-400 mb-2">C++ Code Compiler</h3>
             <p className="mb-4">Powerful C++ compilation with optimization options for high-performance applications.</p>
             <p className="text-sm text-gray-400 mb-2">Note: Compile time input features not available</p>
             <div className="flex justify-end">
-              <Link to="/cpp-compiler" className="text-purple-400 hover:text-purple-300 flex items-center">
+              <Link to="/compilers" className="text-purple-400 hover:text-purple-300 flex items-center">
                 Try now <ArrowRightIcon />
               </Link>
             </div>
           </div>
-          
+
           <div className="bg-gray-700 p-5 rounded-lg">
             <h3 className="text-xl font-semibold text-yellow-400 mb-2">Python Code Compiler</h3>
             <p className="mb-4">Run Python scripts with support for popular libraries and frameworks.</p>
             <p className="text-sm text-gray-400 mb-2">Note: Compile time input features not available</p>
             <div className="flex justify-end">
-              <Link to="/python-compiler" className="text-yellow-400 hover:text-yellow-300 flex items-center">
+              <Link to="/compilers" className="text-yellow-400 hover:text-yellow-300 flex items-center">
                 Try now <ArrowRightIcon />
               </Link>
             </div>
           </div>
-          
+
           <div className="bg-gray-700 p-5 rounded-lg">
             <h3 className="text-xl font-semibold text-green-400 mb-2">JavaScript Code Compiler</h3>
             <p className="mb-4">Execute JavaScript code with browser APIs and Node.js compatibility.</p>
             <p className="text-sm text-gray-400 mb-2">Note: Compile time input features not available</p>
             <div className="flex justify-end">
-              <Link to="/js-compiler" className="text-green-400 hover:text-green-300 flex items-center">
+              <Link to="/compilers" className="text-green-400 hover:text-green-300 flex items-center">
                 Try now <ArrowRightIcon />
               </Link>
             </div>
@@ -277,7 +243,7 @@ const HomePage: React.FC = () => {
       {/* Real-time HTML Output Demo */}
       <section className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-8">Real-time HTML Output</h2>
-        
+
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-800 rounded-lg overflow-hidden">
             <div className="bg-gray-700 px-4 py-2">
@@ -293,7 +259,7 @@ const HomePage: React.FC = () => {
               </pre>
             </div>
           </div>
-          
+
           <div className="bg-gray-800 rounded-lg overflow-hidden">
             <div className="bg-gray-700 px-4 py-2">
               <span className="text-gray-300">Live Preview</span>
@@ -313,7 +279,7 @@ const HomePage: React.FC = () => {
       <section className="max-w-6xl mx-auto px-6 py-16 bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg my-8">
         <h2 className="text-3xl font-bold mb-4 text-center">AI Code Converter</h2>
         <p className="text-xl text-center mb-8">Convert code between languages with our intelligent AI-powered translator</p>
-        
+
         <div className="flex justify-center">
           <Link to="/code-converter" className="bg-white text-purple-700 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition flex items-center">
             Try AI Code Converter <BrainIcon />
