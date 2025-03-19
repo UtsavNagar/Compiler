@@ -1,4 +1,5 @@
 const DOMAIN = "http://localhost:9090/api/compile";
+// const DOMAIN = "backendforcodecompiler-production.up.railway.app";
 
 export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {

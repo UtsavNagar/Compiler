@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { cpp } from "@codemirror/lang-cpp";
 import { java } from "@codemirror/lang-java";
@@ -21,28 +21,102 @@ const defaultCodes: { [key: string]: string } = {
   python: `print("Hello, Python!")`,
 };
 
+const STORAGE_KEY = "codeCompilerState";
+
 const CodeCompiler: React.FC = () => {
   const [language, setLanguage] = useState<string>("cpp");
   const [code, setCode] = useState<string>(defaultCodes[language]);
   const [output, setOutput] = useState<string>("");
+  const [isCompiling, setIsCompiling] = useState<boolean>(false);
+  
+  // Load saved code from localStorage on component mount
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const { savedLanguage, savedCodes } = JSON.parse(savedState);
+        setLanguage(savedLanguage);
+        
+        // If we have saved code for the current language, use it
+        if (savedCodes[savedLanguage]) {
+          setCode(savedCodes[savedLanguage]);
+        } else {
+          setCode(defaultCodes[savedLanguage]);
+        }
+      } catch (error) {
+        console.error("Error loading saved code:", error);
+      }
+    }
+  }, []);
+
+  // Save code to localStorage whenever language or code changes
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    let savedCodes = { ...defaultCodes };
+    
+    if (savedState) {
+      try {
+        const { savedCodes: existingSavedCodes } = JSON.parse(savedState);
+        savedCodes = { ...savedCodes, ...existingSavedCodes };
+      } catch (error) {
+        console.error("Error parsing saved code:", error);
+      }
+    }
+    
+    // Update the code for the current language
+    savedCodes[language] = code;
+    
+    // Save the updated state
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        savedLanguage: language,
+        savedCodes,
+      })
+    );
+  }, [language, code]);
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLang = event.target.value;
+    
+    // Get saved code for the new language
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const { savedCodes } = JSON.parse(savedState);
+        if (savedCodes[newLang]) {
+          setCode(savedCodes[newLang]);
+          setLanguage(newLang);
+          return;
+        }
+      } catch (error) {
+        console.error("Error loading saved code:", error);
+      }
+    }
+    
+    // Fall back to default code if no saved code exists
     setLanguage(newLang);
-    setCode(defaultCodes[newLang]); // Reset to default code for selected language
+    setCode(defaultCodes[newLang]);
   };
 
   const handleCompile = async () => {
+    setIsCompiling(true);
     setOutput("Compiling...");
     
-    const requestData = {
-      code: code,
-      input: "", // Modify if input handling is needed
-      language: language, // Send language to backend
-    };
+    try {
+      const requestData = {
+        code: code,
+        input: "", // Modify if input handling is needed
+        language: language,
+      };
 
-    const result = await compileCode(requestData);
-    setOutput(result);
+      const result = await compileCode(requestData);
+      setOutput(result);
+    } catch (error) {
+      setOutput(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsCompiling(false);
+    }
   };
 
   return (
@@ -62,37 +136,61 @@ const CodeCompiler: React.FC = () => {
 
         <button
           onClick={handleCompile}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          disabled={isCompiling}
+          className={`
+            bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded
+            transition-all duration-300 ease-in-out transform
+            ${isCompiling ? 'scale-95 opacity-75 animate-pulse' : 'scale-100 opacity-100'}
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50
+          `}
         >
-          Compile & Run
+          {isCompiling ? (
+            <>
+              <span className="inline-block animate-spin mr-2">⟳</span>
+              Compiling...
+            </>
+          ) : (
+            "Compile & Run"
+          )}
         </button>
       </div>
 
       {/* Code Editor & Output Panel */}
       <PanelGroup direction="horizontal" className="flex-1">
         {/* Code Editor Panel */}
-        <Panel className="p-4 flex flex-col overflow-auto">
-          <h2 className="text-lg font-bold mb-2">{language.toUpperCase()} Code Editor</h2>
-          <div className="flex-grow border rounded">
-            <CodeMirror
-              value={code}
-              height="100%"
-              extensions={[languageExtensions[language]]}
-              onChange={(value) => setCode(value)}
-              theme="dark"
-            />
+        <Panel className="overflow-hidden flex flex-col">
+          <div className="p-2 bg-gray-800 rounded-t">
+            <h2 className="text-lg font-bold">{language.toUpperCase()} Code Editor</h2>
+          </div>
+          <div className="flex-1 overflow-hidden border border-gray-700 rounded-b relative">
+            <div className="absolute inset-0 overflow-auto">
+              <CodeMirror
+                value={code}
+                height="100%"
+                extensions={[languageExtensions[language]]}
+                onChange={(value) => setCode(value)}
+                theme="dark"
+                className="h-full"
+              />
+            </div>
           </div>
         </Panel>
 
         {/* Resizable Divider */}
-        <PanelResizeHandle className="w-1 bg-gray-600 hover:bg-gray-400 cursor-ew-resize" />
+        <PanelResizeHandle className="w-2 bg-gray-600 hover:bg-blue-500 cursor-ew-resize transition-colors duration-200" />
 
         {/* Output Panel */}
-        <Panel className="p-4 bg-gray-800 overflow-auto">
-          <h2 className="text-lg font-bold mb-2">Output / Errors</h2>
-          <pre className="border p-4 bg-black text-green-400 rounded h-full overflow-auto">
-            {output}
-          </pre>
+        <Panel className="overflow-hidden flex flex-col">
+          <div className="p-2 bg-gray-800 rounded-t">
+            <h2 className="text-lg font-bold">Output / Errors</h2>
+          </div>
+          <div className="flex-1 border border-gray-700 bg-black rounded-b relative">
+            <div className="absolute inset-0 overflow-auto p-4">
+              <pre className="text-green-400 font-mono whitespace-pre-wrap">
+                {output}
+              </pre>
+            </div>
+          </div>
         </Panel>
       </PanelGroup>
     </div>

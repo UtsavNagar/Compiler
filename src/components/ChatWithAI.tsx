@@ -26,15 +26,15 @@ const formatCodeBlocks = (text: string): React.ReactNode => {
             // Extract language and code
             const match = part.match(/```(\w*)\n([\s\S]*?)```/);
             if (!match) return <span key={index}>{part}</span>;
-            
+
             const [, language, code] = match;
-            
+
             return (
                 <div key={index} className="my-4 rounded-lg overflow-hidden">
                     {language && (
                         <div className="bg-gray-800 px-4 py-2 text-xs text-gray-400 flex justify-between">
                             <span>{language}</span>
-                            <button 
+                            <button
                                 className="text-blue-400 hover:text-blue-300"
                                 onClick={() => navigator.clipboard.writeText(code)}
                             >
@@ -100,7 +100,7 @@ const ChatWithAI: React.FC = () => {
                     }))
                 }));
                 setChats(parsedChats);
-                
+
                 // Set the most recent chat as active if any exist
                 if (parsedChats.length > 0) {
                     setActiveChat(parsedChats[0]);
@@ -134,19 +134,18 @@ const ChatWithAI: React.FC = () => {
     };
 
     const updateChatTitle = (chatId: string, firstMessage: string) => {
-        // Create a title from the first message (truncate if too long)
-        const newTitle = firstMessage.length > 25 
-            ? firstMessage.substring(0, 25) + '...' 
-            : firstMessage;
+        const words = firstMessage.split(/\s+/).slice(0, 4).join(' '); // Get first 4 words
+        const newTitle = words.length > 25 ? words.substring(0, 25) + '...' : words;
 
-        setChats(prev => prev.map(chat => 
+        setChats(prev => prev.map(chat =>
             chat.id === chatId ? { ...chat, title: newTitle } : chat
         ));
     };
 
+
     const deleteChat = (chatId: string) => {
         setChats(prev => prev.filter(chat => chat.id !== chatId));
-        
+
         // If the deleted chat was active, set a new active chat
         if (activeChat?.id === chatId) {
             const remainingChats = chats.filter(chat => chat.id !== chatId);
@@ -182,11 +181,11 @@ const ChatWithAI: React.FC = () => {
         const updatedChat = { ...currentChat, messages: updatedMessages };
 
         // Update the chat
-        setChats(prev => prev.map(chat => 
+        setChats(prev => prev.map(chat =>
             chat.id === updatedChat.id ? updatedChat : chat
         ));
         setActiveChat(updatedChat);
-        
+
         // Update chat title if this is the first message
         if (currentChat.messages.length === 0) {
             updateChatTitle(updatedChat.id, inputValue);
@@ -210,7 +209,7 @@ const ChatWithAI: React.FC = () => {
             const finalMessages = [...updatedMessages, geminiMessage];
             const finalChat = { ...updatedChat, messages: finalMessages };
 
-            setChats(prev => prev.map(chat => 
+            setChats(prev => prev.map(chat =>
                 chat.id === finalChat.id ? finalChat : chat
             ));
             setActiveChat(finalChat);
@@ -228,7 +227,7 @@ const ChatWithAI: React.FC = () => {
             const finalMessages = [...updatedMessages, errorMessage];
             const finalChat = { ...updatedChat, messages: finalMessages };
 
-            setChats(prev => prev.map(chat => 
+            setChats(prev => prev.map(chat =>
                 chat.id === finalChat.id ? finalChat : chat
             ));
             setActiveChat(finalChat);
@@ -259,12 +258,22 @@ const ChatWithAI: React.FC = () => {
                             className={`p-3 cursor-pointer flex justify-between items-center hover:bg-gray-700 ${activeChat?.id === chat.id ? 'bg-gray-700' : ''}`}
                             onClick={() => setActiveChat(chat)}
                         >
-                            <div className="truncate flex-1">
-                                <p className="font-medium">{chat.title}</p>
-                                <p className="text-xs text-gray-400">
-                                    {new Date(chat.createdAt).toLocaleDateString()}
-                                </p>
-                            </div>
+                            <input
+                                type="text"
+                                value={chat.title}
+                                onChange={(e) => {
+                                    const newTitle = e.target.value;
+                                    setChats(prev => prev.map(c =>
+                                        c.id === chat.id ? { ...c, title: newTitle } : c
+                                    ));
+                                }}
+                                onBlur={() => {
+                                    if (!chat.title.trim()) {
+                                        updateChatTitle(chat.id, chat.messages[0]?.content || 'New Chat');
+                                    }
+                                }}
+                                className="bg-transparent border-none outline-none flex-1 truncate text-white"
+                            />
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -278,6 +287,7 @@ const ChatWithAI: React.FC = () => {
                             </button>
                         </div>
                     ))}
+
                 </div>
             </div>
 
@@ -285,7 +295,7 @@ const ChatWithAI: React.FC = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
                 <header className="p-4 bg-gray-800 shadow flex items-center justify-between">
-                    <button 
+                    <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         className="p-2 rounded-md hover:bg-gray-700"
                     >
@@ -303,7 +313,7 @@ const ChatWithAI: React.FC = () => {
                 {activeChat && (
                     <div className="bg-blue-900 p-2 text-sm flex justify-between items-center">
                         <p>Chats are stored only on this device</p>
-                        <button 
+                        <button
                             className="text-blue-300 hover:text-blue-100"
                             onClick={() => deleteChat(activeChat.id)}
                         >
@@ -328,11 +338,10 @@ const ChatWithAI: React.FC = () => {
                                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div
-                                    className={`max-w-3/4 p-3 rounded-lg ${
-                                        message.sender === 'user'
+                                    className={`max-w-3/4 p-3 rounded-lg ${message.sender === 'user'
                                             ? 'bg-blue-600 text-white rounded-br-none'
                                             : 'bg-gray-700 rounded-bl-none'
-                                    }`}
+                                        }`}
                                 >
                                     {message.sender === 'gemini' ? (
                                         <div className="whitespace-pre-wrap">
