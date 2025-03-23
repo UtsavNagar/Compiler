@@ -1,7 +1,0 @@
-com/example/compilers/config/WebConfig.class
-com/example/compilers/controller/CodeCompilerController$CodeRequest.class
-com/example/compiler/controller/CppCompilerController.class
-com/example/compilers/controller/HelloController.class
-com/example/compilers/controller/CodeCompilerController.class
-com/example/compilers/CompilersApplication.class
-com/example/compiler/controller/HomeController.class
