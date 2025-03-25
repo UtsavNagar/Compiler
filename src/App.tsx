@@ -5,6 +5,7 @@ import HomePage from "./components/HomePage";
 import ChatWithAI from "./components/ChatWithAI";
 import CodeConverter from "./components/CodeConverted";
 import Navbar from "./components/NavBar";
+import AuthForm from "./components/AuthForm";
 
 const App: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const App: React.FC = () => {
       <Navbar/>
       <Routes>
         <Route path="/" element={<HomePage/>} />
+        <Route path="/auth" element={<AuthForm/>} />
         <Route path="/html-compiler" element={<HtmlCompiler />} />
         <Route path="/compilers" element={<CppCompiler />} />
         <Route path="/chat-section" element={<ChatWithAI />} />
