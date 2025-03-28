@@ -10,7 +10,6 @@ export const compileCode = async (data: { code: string; input: string; language:
         credentials: 'include', // Important for CORS with credentials
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'http://localhost:5173' // Optional, but can help
         },
       body: JSON.stringify({ code: data.code, input: data.input }),
     });
