@@ -55,21 +55,6 @@ const ArrowRightIcon = () => (
 );
 
 
-const ZapIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-  </svg>
-);
-
-const LayoutGridIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="7" height="7"></rect>
-    <rect x="14" y="3" width="7" height="7"></rect>
-    <rect x="14" y="14" width="7" height="7"></rect>
-    <rect x="3" y="14" width="7" height="7"></rect>
-  </svg>
-);
-
 const BrainIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-4.04Z"></path>
@@ -77,18 +62,6 @@ const BrainIcon = () => (
   </svg>
 );
 
-const PlayIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-  </svg>
-);
-
-// Fixed Link component with TypeScript types
-interface LinkProps {
-  to: string;
-  className?: string;
-  children: React.ReactNode;
-}
 
 const HomePage: React.FC = () => {
   return (

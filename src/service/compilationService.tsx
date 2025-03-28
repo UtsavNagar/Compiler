@@ -1,5 +1,5 @@
-// const DOMAIN = "http://localhost:8080/api/compile";
-const DOMAIN = "https://backendforcodecompiler.onrender.com";
+const DOMAIN = "http://localhost:8080/api/compile";
+// const DOMAIN = "https://backendforcodecompiler.onrender.com";
 
 export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {
@@ -7,19 +7,21 @@ export const compileCode = async (data: { code: string; input: string; language:
 
     const response = await fetch(endpoint, {
       method: 'POST',
+      credentials: 'include', // Important for CORS with credentials
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:5173'
       },
-      body: JSON.stringify({ code: data.code, input: data.input }), // Send only required data
+      body: JSON.stringify({ code: data.code, input: data.input }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
     }
 
     return await response.text();
   } catch (error) {
+    console.error('Compilation Error:', error);
     if (error instanceof Error) {
       return "Error: " + error.message;
     }

@@ -3,33 +3,27 @@ import DOMPurify from "dompurify";
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 
-interface File {
-  id: string;
-  name: string;
-  content: string;
-}
+// interface File {
+//   id: string;
+//   name: string;
+//   content: string;
+// }
 
 const HtmlCompiler: React.FC = () => {
   const [htmlCode, setHtmlCode] = useState(() => localStorage.getItem("currentHtmlCode") || "<h1>Hello, TypeScript!</h1>");
-  const [files, setFiles] = useState<File[]>(() => JSON.parse(localStorage.getItem("htmlFiles") || "[]"));
-  const [currentFileName, setCurrentFileName] = useState("HTML");
-  const [sidebarWidth, setSidebarWidth] = useState(200);
   const [splitPosition, setSplitPosition] = useState(50);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [cssCode, setCssCode] = useState("");
 
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const splitRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const isDraggingSidebar = useRef(false);
+  const splitRef = useRef<HTMLDivElement>(null);
   const isDraggingSplit = useRef(false);
   const startXRef = useRef(0);
   const startPositionRef = useRef(0);
 
   useEffect(() => {
     localStorage.setItem("currentHtmlCode", htmlCode);
-    localStorage.setItem("htmlFiles", JSON.stringify(files));
-  }, [htmlCode, files]);
+  }, [htmlCode]);
 
   // Process HTML and update iframe whenever htmlCode changes
   useEffect(() => {
@@ -75,25 +69,7 @@ const HtmlCompiler: React.FC = () => {
     iframeDocument.close();
   };
 
-  const handleSidebarMouseDown = (e: React.MouseEvent) => {
-    isDraggingSidebar.current = true;
-    document.addEventListener("mousemove", handleSidebarMouseMove);
-    document.addEventListener("mouseup", handleSidebarMouseUp);
-  };
-
-  const handleSidebarMouseMove = (e: MouseEvent) => {
-    if (isDraggingSidebar.current) {
-      setSidebarWidth(Math.min(Math.max(e.clientX, 100), 300));
-    }
-  };
-
-  const handleSidebarMouseUp = () => {
-    isDraggingSidebar.current = false;
-    document.removeEventListener("mousemove", handleSidebarMouseMove);
-    document.removeEventListener("mouseup", handleSidebarMouseUp);
-  };
-
-  // Fixed split dragging functionality with TypeScript compatibility
+  // Split dragging functionality
   const handleSplitMouseDown = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent text selection when dragging
     isDraggingSplit.current = true;
@@ -147,7 +123,6 @@ const HtmlCompiler: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full">
         <div className="bg-gray-800 p-3 flex items-center justify-between border-b border-gray-700">
-          <h1 className="text-xl font-bold">{currentFileName}</h1>
           <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded" onClick={() => setIsFullscreen(!isFullscreen)}>
             {isFullscreen ? "Exit Fullscreen" : "Fullscreen Preview"}
           </button>
