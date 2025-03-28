@@ -1,16 +1,17 @@
-const DOMAIN = "http://localhost:8080/api/compile";
-// const DOMAIN = "https://backendforcodecompiler.onrender.com";
+// const DOMAIN = "http://localhost:8080/api/compile";
+const DOMAIN = "https://backendforcodecompiler.onrender.com";
 
 export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {
-    let endpoint = `${DOMAIN}/${data.language}`; // Dynamically choose the right API endpoint
+    let endpoint = `${DOMAIN}/api/compile/${data.language}`;
 
     const response = await fetch(endpoint, {
       method: 'POST',
-      credentials: 'include', // Important for CORS with credentials
-      headers: {
-        'Content-Type': 'application/json',
-      },
+        credentials: 'include', // Important for CORS with credentials
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': 'http://localhost:5173' // Optional, but can help
+        },
       body: JSON.stringify({ code: data.code, input: data.input }),
     });
 
