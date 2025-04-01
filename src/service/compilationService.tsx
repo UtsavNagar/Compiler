@@ -1,5 +1,5 @@
-// const DOMAIN = "http://localhost:8080/api/compile";
-const DOMAIN = "https://backendforcodecompiler.onrender.com";
+const DOMAIN = "http://localhost:8080";
+// const DOMAIN = "https://backendforcodecompiler.onrender.com";
 
 export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {
