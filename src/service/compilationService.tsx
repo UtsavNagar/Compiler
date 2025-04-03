@@ -11,18 +11,29 @@ const getAuthToken = async (): Promise<string> => {
 };
 
 /**
+ * Helper function to get the current user's email
+ */
+const getUserEmail = async (): Promise<string> => {
+  const user = await import("firebase/auth").then(({ getAuth }) => getAuth().currentUser);
+  if (!user || !user.email) throw new Error("User email not available");
+  return user.email; // Ensured to be a string
+};
+
+/**
  * Helper function to handle API requests
  */
 const apiRequest = async (endpoint: string, method: string, data?: any) => {
   try {
     const token = await getAuthToken();
+    const userEmail = await getUserEmail(); // Guaranteed to be a string
 
     const response = await fetch(`${DOMAIN}${endpoint}`, {
       method,
-      credentials: "include", // Important for CORS with credentials
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Send Firebase token in headers
+        "Authorization": `Bearer ${token}`, // Send Firebase token in headers
+        "User-Email": userEmail, // Add the required User-Email header
       },
       body: data ? JSON.stringify(data) : undefined,
     });
@@ -101,12 +112,15 @@ export const removeUserAccess = async (fileId: string, userEmail: string) => {
  */
 export const compileCode = async (data: { code: string; input: string; language: string }) => {
   try {
+    const userEmail = await getUserEmail();
     let endpoint = `${DOMAIN}/api/compile/${data.language}`;
+
     const response = await fetch(endpoint, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        "User-Email": userEmail,
       },
       body: JSON.stringify({ code: data.code, input: data.input }),
     });
