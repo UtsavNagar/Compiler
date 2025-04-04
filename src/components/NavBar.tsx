@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { User } from 'firebase/auth';
 import { signInWithGoogle, auth } from '../firebase/firebase';
 
+// icons
+import { RiChat3Line } from "react-icons/ri";
+import { LuLogIn } from "react-icons/lu";
+import { FaRegUserCircle } from 'react-icons/fa';
+
 const CodeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="16 18 22 12 16 6"></polyline>
@@ -41,7 +46,6 @@ const Navbar: React.FC<NavbarProps> = ({ user }) => {
       console.error("Logout error:", error);
     }
   };
-console.log(user?.photoURL)
   return (
     <nav className="px-6 py-4 flex justify-between items-center border-b border-gray-700 bg-gray-900 text-white relative">
       <div className="flex items-center space-x-2">
@@ -73,18 +77,25 @@ console.log(user?.photoURL)
           onClick={() => handleNavigation("/chat-section")}
           className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md font-semibold transition cursor-pointer"
         >
-          Start Chat
+          <RiChat3Line />
         </span>
 
         {/* User Profile Section */}
         {user ? (
           <div className="relative">
-            <img
-              src={user?.photoURL?.toString() ?? "https://cdn.pixabay.com/photo/2021/11/24/05/19/user-6820232_1280.png"}
-              alt="User Profile"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-10 h-10 rounded-full cursor-pointer"
-            />
+            {user.photoURL ? (
+              <img
+                src={user.photoURL.toString()}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-10 h-10 rounded-full cursor-pointer"
+              />
+            ) : (
+              <FaRegUserCircle
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-10 h-10 rounded-full cursor-pointer text-gray-300"
+              />
+            )}
+
             {dropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
                 <div className="px-4 py-2 text-sm">
@@ -106,7 +117,7 @@ console.log(user?.photoURL)
             onClick={() => signInWithGoogle()}
             className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md font-semibold transition"
           >
-            Login
+            <LuLogIn />
           </button>
         )}
       </div>

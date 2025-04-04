@@ -4,17 +4,28 @@ import { cpp } from "@codemirror/lang-cpp";
 import { java } from "@codemirror/lang-java";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
-import { 
-  compileCode, 
-  createFile, 
-  getVisibleFiles, 
-  getFileById, 
-  updateFile, 
+import {
+  compileCode,
+  createFile,
+  getVisibleFiles,
+  getFileById,
+  updateFile,
   deleteFile,
   addUserAccess,
   removeUserAccess
 } from "../service/compilationService";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+
+// icons
+import { VscDebugStart, VscNewFile } from "react-icons/vsc";
+import { IoIosSave, IoMdAddCircleOutline } from "react-icons/io";
+import { FcCollaboration } from "react-icons/fc";
+import { MdDelete, MdOutlineClose } from "react-icons/md";
+import { FaHourglassStart } from "react-icons/fa6";
+import { IoPersonRemoveOutline } from "react-icons/io5";
+import { SiCplusplus, SiJavascript, SiPython } from "react-icons/si";
+import { VscFile } from "react-icons/vsc"; // fallback/default icon
+import { FaJava } from "react-icons/fa";
 
 // Type definitions
 interface CodeFile {
@@ -60,11 +71,11 @@ const CodeCompiler: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [originalCode, setOriginalCode] = useState<string>("");
-  
+
   // For new file dialog
   const [showNewFileDialog, setShowNewFileDialog] = useState<boolean>(false);
   const [newFileName, setNewFileName] = useState<string>("");
-  
+
   // For access control dialog
   const [showAccessDialog, setShowAccessDialog] = useState<boolean>(false);
   const [newUserEmail, setNewUserEmail] = useState<string>("");
@@ -76,7 +87,7 @@ const CodeCompiler: React.FC = () => {
       try {
         const userFiles = await getVisibleFiles();
         setFiles(userFiles);
-        
+
         // If we have files, load the first one
         if (userFiles.length > 0) {
           await loadFileContent(userFiles[0].id);
@@ -87,7 +98,7 @@ const CodeCompiler: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     loadFiles();
   }, []);
 
@@ -99,7 +110,7 @@ const CodeCompiler: React.FC = () => {
         try {
           const { savedLanguage, savedCodes } = JSON.parse(savedState);
           setLanguage(savedLanguage);
-          
+
           // If we have saved code for the current language, use it
           if (savedCodes[savedLanguage]) {
             setCode(savedCodes[savedLanguage]);
@@ -118,7 +129,7 @@ const CodeCompiler: React.FC = () => {
     if (!currentFile) {
       const savedState = localStorage.getItem(STORAGE_KEY);
       let savedCodes = { ...defaultCodes };
-      
+
       if (savedState) {
         try {
           const { savedCodes: existingSavedCodes } = JSON.parse(savedState);
@@ -127,10 +138,10 @@ const CodeCompiler: React.FC = () => {
           console.error("Error parsing saved code:", error);
         }
       }
-      
+
       // Update the code for the current language
       savedCodes[language] = code;
-      
+
       // Save the updated state
       localStorage.setItem(
         STORAGE_KEY,
@@ -147,12 +158,12 @@ const CodeCompiler: React.FC = () => {
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLang = event.target.value;
-    
+
     if (currentFile) {
       // Don't change the language of a saved file
       return;
     }
-    
+
     // Get saved code for the new language
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
@@ -167,7 +178,7 @@ const CodeCompiler: React.FC = () => {
         console.error("Error loading saved code:", error);
       }
     }
-    
+
     // Fall back to default code if no saved code exists
     setLanguage(newLang);
     setCode(defaultCodes[newLang]);
@@ -176,7 +187,7 @@ const CodeCompiler: React.FC = () => {
   const handleCompile = async () => {
     setIsCompiling(true);
     setOutput("Compiling...");
-    
+
     try {
       const requestData = {
         code: code,
@@ -201,7 +212,7 @@ const CodeCompiler: React.FC = () => {
       setCode(file.code);
       setOriginalCode(file.code);
       setHasUnsavedChanges(false);
-      
+
       // Set language based on file extension
       for (const [lang, ext] of Object.entries(extensionMap)) {
         if (ext === file.extension) {
@@ -225,7 +236,7 @@ const CodeCompiler: React.FC = () => {
         const updatedFile = await updateFile(currentFile.id, {
           code: code
         });
-        
+
         // Update the files list
         setFiles(files.map(f => f.id === updatedFile.id ? updatedFile : f));
         setCurrentFile(updatedFile);
@@ -248,7 +259,7 @@ const CodeCompiler: React.FC = () => {
       setOutput("File name cannot be empty");
       return;
     }
-    
+
     setIsSaving(true);
     try {
       const fileData = {
@@ -257,9 +268,9 @@ const CodeCompiler: React.FC = () => {
         code: code,
         visibleToUsers: [] as string[]
       };
-      
+
       const newFile = await createFile(fileData);
-      
+
       // Add to files list and set as current
       setFiles([...files, newFile]);
       setCurrentFile(newFile);
@@ -277,17 +288,17 @@ const CodeCompiler: React.FC = () => {
 
   const handleDeleteFile = async () => {
     if (!currentFile) return;
-    
+
     if (!window.confirm(`Are you sure you want to delete ${currentFile.fileName}.${currentFile.extension}?`)) {
       return;
     }
-    
+
     try {
       await deleteFile(currentFile.id);
-      
+
       // Remove from files list
       setFiles(files.filter(f => f.id !== currentFile.id));
-      
+
       // Clear current file
       setCurrentFile(null);
       setCode(defaultCodes[language]);
@@ -300,10 +311,10 @@ const CodeCompiler: React.FC = () => {
 
   const handleAddUserAccess = async () => {
     if (!currentFile || !newUserEmail.trim()) return;
-    
+
     try {
       const updatedFile = await addUserAccess(currentFile.id, newUserEmail);
-      
+
       // Update files list and current file
       setFiles(files.map(f => f.id === updatedFile.id ? updatedFile : f));
       setCurrentFile(updatedFile);
@@ -316,10 +327,10 @@ const CodeCompiler: React.FC = () => {
 
   const handleRemoveUserAccess = async (email: string) => {
     if (!currentFile) return;
-    
+
     try {
       const updatedFile = await removeUserAccess(currentFile.id, email);
-      
+
       // Update files list and current file
       setFiles(files.map(f => f.id === updatedFile.id ? updatedFile : f));
       setCurrentFile(updatedFile);
@@ -332,7 +343,7 @@ const CodeCompiler: React.FC = () => {
   const handleNewFile = () => {
     // Clear current file
     setCurrentFile(null);
-    
+
     // Reset to default code for selected language
     setCode(defaultCodes[language]);
     setOutput("");
@@ -343,6 +354,21 @@ const CodeCompiler: React.FC = () => {
     setCode(value);
     if (currentFile) {
       setHasUnsavedChanges(value !== originalCode);
+    }
+  };
+
+  const getFileIcon = (extension: string) => {
+    switch (extension) {
+      case "cpp":
+        return <SiCplusplus className="text-blue-400 mr-2" />;
+      case "js":
+        return <SiJavascript className="text-yellow-400 mr-2" />;
+      case "java":
+        return <FaJava className="text-red-400 mr-2" />;
+      case "py":
+        return <SiPython className="text-blue-300 mr-2" />;
+      default:
+        return <VscFile className="text-gray-400 mr-2" />;
     }
   };
 
@@ -362,7 +388,7 @@ const CodeCompiler: React.FC = () => {
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
           </select>
-          
+
           <div className={`text-sm ${hasUnsavedChanges ? 'text-yellow-600 font-bold' : ''}`}>
             {currentFile ? `${currentFile.fileName}.${currentFile.extension}${hasUnsavedChanges ? ' (unsaved)' : ''}` : "Unsaved Code"}
           </div>
@@ -370,6 +396,7 @@ const CodeCompiler: React.FC = () => {
 
         <div className="flex items-center space-x-2">
           <button
+            title="save"
             onClick={handleSaveFile}
             disabled={isSaving}
             className={`
@@ -380,23 +407,24 @@ const CodeCompiler: React.FC = () => {
               focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50
             `}
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? <FaHourglassStart /> : <IoIosSave />}
           </button>
 
           {currentFile && (
             <>
               <button
+                title="add collaborator"
                 onClick={() => setShowAccessDialog(true)}
                 className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded"
               >
-                Access Control
+                <FcCollaboration />
               </button>
-              
+
               <button
                 onClick={handleDeleteFile}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
               >
-                Delete
+                <MdDelete />
               </button>
             </>
           )}
@@ -413,11 +441,11 @@ const CodeCompiler: React.FC = () => {
           >
             {isCompiling ? (
               <>
-                <span className="inline-block animate-spin mr-2">⟳</span>
-                Compiling...
+                <span className="inline-block animate-spin"><FaHourglassStart /></span>
+
               </>
             ) : (
-              "Compile & Run"
+              <VscDebugStart />
             )}
           </button>
         </div>
@@ -430,10 +458,11 @@ const CodeCompiler: React.FC = () => {
           <div className="p-2 bg-gray-800 rounded-t flex justify-between items-center">
             <h2 className="text-lg font-bold">Files</h2>
             <button
+              title="new file"
               onClick={handleNewFile}
               className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-sm"
             >
-              New File
+              <VscNewFile />
             </button>
           </div>
           <div className="flex-1 border border-gray-700 bg-gray-800 rounded-b overflow-auto p-2">
@@ -446,7 +475,7 @@ const CodeCompiler: React.FC = () => {
             ) : (
               <ul className="space-y-1">
                 {files.map((file) => (
-                  <li 
+                  <li
                     key={file.id}
                     onClick={() => loadFileContent(file.id)}
                     className={`
@@ -455,7 +484,11 @@ const CodeCompiler: React.FC = () => {
                     `}
                   >
                     <div className="flex items-center">
-                      <span className="flex-1 truncate">{file.fileName}.{file.extension}</span>
+                      <>
+                        {getFileIcon(file.extension)}
+                        <span className="flex-1 truncate">{file.fileName}.{file.extension}</span>
+                      </>
+
                     </div>
                   </li>
                 ))}
@@ -547,7 +580,7 @@ const CodeCompiler: React.FC = () => {
             <h3 className="text-xl font-bold mb-4">
               Access Control: {currentFile.fileName}.{currentFile.extension}
             </h3>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Add User Access</label>
               <div className="flex space-x-2">
@@ -562,11 +595,11 @@ const CodeCompiler: React.FC = () => {
                   onClick={handleAddUserAccess}
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded"
                 >
-                  Add
+                  <IoMdAddCircleOutline />
                 </button>
               </div>
             </div>
-            
+
             <div className="mb-4">
               <h4 className="text-sm font-medium mb-2">Users with access:</h4>
               <ul className="max-h-60 overflow-y-auto bg-gray-700 rounded p-2">
@@ -578,20 +611,20 @@ const CodeCompiler: React.FC = () => {
                         onClick={() => handleRemoveUserAccess(email)}
                         className="text-red-400 hover:text-red-300"
                       >
-                        Remove
+                        <IoPersonRemoveOutline />
                       </button>
                     )}
                   </li>
                 ))}
               </ul>
             </div>
-            
+
             <div className="flex justify-end">
               <button
                 onClick={() => setShowAccessDialog(false)}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
               >
-                Close
+                <MdOutlineClose />
               </button>
             </div>
           </div>

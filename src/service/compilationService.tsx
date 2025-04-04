@@ -1,5 +1,5 @@
-const DOMAIN = "http://localhost:8080";
-// const DOMAIN = "https://backendforcodecompiler.onrender.com";
+// const DOMAIN = "http://localhost:8080";
+const DOMAIN = "https://backendforcodecompiler.onrender.com";
 
 /**
  * Helper function to get Firebase authentication token
@@ -43,7 +43,15 @@ const apiRequest = async (endpoint: string, method: string, data?: any) => {
       throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
     }
 
-    return await response.json();
+    // Check if there's content to parse
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const text = await response.text();
+      return text ? JSON.parse(text) : {}; // Parse only if there's content
+    } else {
+      // For non-JSON responses or empty responses
+      return { success: true };
+    }
   } catch (error) {
     console.error("API Error:", error);
     throw error;
